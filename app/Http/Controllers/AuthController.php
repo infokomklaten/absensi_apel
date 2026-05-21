@@ -36,7 +36,7 @@ class AuthController extends Controller
             return back()->withErrors(['nip' => 'NIP atau Password salah'])->withInput(['nip' => $request->nip]);
         }
 
-        Auth::guard('pegawai')->login($pegawai, $request->boolean('remember'));
+        Auth::guard('pegawai')->login($pegawai, true);
 
         $request->session()->regenerate();
 

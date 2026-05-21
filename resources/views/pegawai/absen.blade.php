@@ -26,7 +26,6 @@
         height: 100%;
         object-fit: cover;
         display: block;
-        transform: scaleX(-1);
     }
 
     #canvasElement { display: none; }
@@ -37,7 +36,31 @@
         object-fit: cover;
         border-radius: 20px;
         display: none;
-        transform: scaleX(-1);
+    }
+
+    .camera-message {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(15,23,42,0.88);
+        color: #fff;
+        text-align: center;
+    }
+
+    .camera-message .title {
+        font-weight: 800;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .camera-message .text {
+        color: #cbd5e1;
+        font-size: 13px;
+        line-height: 1.5;
     }
 
     .camera-overlay {
@@ -53,13 +76,13 @@
 
     .face-guide {
         position: absolute;
-        top: 10%;
+        top: 7%;
         left: 50%;
-        width: min(58%, 300px);
-        height: 56%;
+        width: min(42%, 220px);
+        height: 64%;
         transform: translateX(-50%);
         border: 2px dashed rgba(255,255,255,0.82);
-        border-radius: 48% 48% 44% 44%;
+        border-radius: 50% 50% 46% 46%;
         box-shadow: 0 0 0 999px rgba(15,23,42,0.16);
         pointer-events: none;
     }
@@ -239,9 +262,9 @@
 
     @media (max-width: 420px) {
         .face-guide {
-            top: 9%;
-            width: 64%;
-            height: 54%;
+            top: 7%;
+            width: 42%;
+            height: 64%;
         }
 
         .face-guide::after {
@@ -277,6 +300,12 @@
         <div class="face-guide" id="faceGuide"></div>
         <div class="watermark-safe-zone" id="watermarkSafeZone">
             <span>Area watermark, jaga wajah tetap di atas garis</span>
+        </div>
+        <div class="camera-message" id="cameraMessage">
+            <div>
+                <div class="title" id="cameraMessageTitle">Kamera belum aktif</div>
+                <div class="text" id="cameraMessageText">Izinkan akses kamera untuk mengambil foto presensi.</div>
+            </div>
         </div>
 
         <div class="camera-overlay" id="cameraOverlay">
@@ -370,6 +399,9 @@ const cameraOverlay = document.getElementById('cameraOverlay');
 const previewOverlay = document.getElementById('previewOverlay');
 const faceGuide = document.getElementById('faceGuide');
 const watermarkSafeZone = document.getElementById('watermarkSafeZone');
+const cameraMessage = document.getElementById('cameraMessage');
+const cameraMessageTitle = document.getElementById('cameraMessageTitle');
+const cameraMessageText = document.getElementById('cameraMessageText');
 
 // Jam realtime
 function updateWaktu() {
@@ -381,15 +413,77 @@ updateWaktu();
 setInterval(updateWaktu, 1000);
 
 // Kamera
+function setCameraMessage(title, text) {
+    cameraMessageTitle.textContent = title;
+    cameraMessageText.textContent = text;
+    cameraMessage.style.display = 'flex';
+    faceGuide.style.display = 'none';
+    watermarkSafeZone.style.display = 'none';
+    btnCapture.disabled = true;
+    btnCapture.style.opacity = '0.5';
+    btnCapture.style.cursor = 'not-allowed';
+}
+
+function clearCameraMessage() {
+    cameraMessage.style.display = 'none';
+    faceGuide.style.display = 'block';
+    watermarkSafeZone.style.display = 'block';
+    btnCapture.disabled = false;
+    btnCapture.style.opacity = '1';
+    btnCapture.style.cursor = 'pointer';
+}
+
+function getCameraStream(constraints) {
+    if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+        return navigator.mediaDevices.getUserMedia(constraints);
+    }
+
+    const legacyGetUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    if (legacyGetUserMedia) {
+        return new Promise((resolve, reject) => {
+            legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+        });
+    }
+
+    return Promise.reject(new Error('CAMERA_API_UNAVAILABLE'));
+}
+
+function cameraErrorMessage(err) {
+    const isLocalhost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+
+    if (!window.isSecureContext && !isLocalhost) {
+        return 'Kamera hanya bisa diakses melalui HTTPS atau localhost. Jika dibuka dari HP menggunakan alamat IP jaringan, aktifkan HTTPS/SSL atau gunakan tunnel HTTPS seperti ngrok.';
+    }
+
+    if (err.message === 'CAMERA_API_UNAVAILABLE') {
+        return 'Browser ini tidak mendukung akses kamera pada halaman ini. Gunakan Chrome/Safari terbaru dan buka halaman melalui HTTPS.';
+    }
+
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        return 'Izin kamera ditolak. Buka pengaturan browser, izinkan kamera untuk situs ini, lalu muat ulang halaman.';
+    }
+
+    if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        return 'Kamera tidak ditemukan di perangkat ini.';
+    }
+
+    if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+        return 'Kamera sedang dipakai aplikasi lain. Tutup aplikasi kamera/meeting lain lalu coba lagi.';
+    }
+
+    return err.message || 'Pastikan izin kamera diberikan dan browser mendukung akses kamera.';
+}
+
 async function startCamera() {
     try {
-        stream = await navigator.mediaDevices.getUserMedia({
+        stream = await getCameraStream({
             video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 960 } },
             audio: false
         });
         video.srcObject = stream;
+        clearCameraMessage();
     } catch (err) {
-        alert('Gagal mengakses kamera: ' + err.message + '\nPastikan izin kamera diberikan.');
+        setCameraMessage('Gagal mengakses kamera', cameraErrorMessage(err));
     }
 }
 
@@ -401,10 +495,7 @@ btnCapture.addEventListener('click', () => {
     const ctx = canvas.getContext('2d');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    ctx.save();
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-    ctx.restore();
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     const dataURL = canvas.toDataURL('image/jpeg', 0.85);
     document.getElementById('fotoData').value = dataURL;

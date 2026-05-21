@@ -13,16 +13,16 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $totalPegawai = Pegawai::where('role', 'pegawai')->where('aktif', true)->count();
+        $totalPegawai = Pegawai::where('aktif', true)->count();
         $absensiPegawaiHariIni = Absensi::whereDate('tanggal', today())
-            ->whereHas('pegawai', fn($q) => $q->where('role', 'pegawai')->where('aktif', true));
+            ->whereHas('pegawai', fn($q) => $q->where('aktif', true));
         $absenHariIni = (clone $absensiPegawaiHariIni)->count();
         $hadirHariIni = (clone $absensiPegawaiHariIni)->where('status', 'hadir')->count();
         $belumAbsen = $totalPegawai - $absenHariIni;
 
         $absensiHariIni = Absensi::with('pegawai')
             ->whereDate('tanggal', today())
-            ->whereHas('pegawai', fn($q) => $q->where('role', 'pegawai')->where('aktif', true))
+            ->whereHas('pegawai', fn($q) => $q->where('aktif', true))
             ->orderBy('waktu_absen')
             ->get();
 
@@ -31,7 +31,7 @@ class AdminController extends Controller
             fn($hari) => Carbon::parse($hari)->lte(today())
         );
         $totalHariAbsensiBulanIni = count($hariAbsensiBulanIni);
-        $rekapBulanIni = Pegawai::where('role', 'pegawai')->where('aktif', true)
+        $rekapBulanIni = Pegawai::where('aktif', true)
             ->withCount([
                 'absensi as hadir_count' => fn($q) => $q
                     ->where('status', 'hadir')
@@ -163,7 +163,7 @@ class AdminController extends Controller
 
         $namaBulan = Carbon::createFromDate($tahun, $bln, 1)->translatedFormat('F Y');
 
-        $pegawai = Pegawai::where('role', 'pegawai')->where('aktif', true)->orderBy('nama')->get();
+        $pegawai = Pegawai::where('aktif', true)->orderBy('nama')->get();
         $absensi = Absensi::with('pegawai')
             ->whereYear('tanggal', $tahun)
             ->whereMonth('tanggal', $bln)

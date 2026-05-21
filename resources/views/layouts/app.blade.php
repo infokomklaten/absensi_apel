@@ -44,6 +44,7 @@
         .sidebar-brand {
             padding: 24px 20px 16px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
+            position: relative;
         }
 
         .sidebar-brand h5 {
@@ -114,6 +115,21 @@
 
         .sidebar-link i { width: 18px; text-align: center; font-size: 14px; }
 
+        .sidebar-close {
+            display: none;
+            position: absolute;
+            top: 18px;
+            right: 16px;
+            width: 34px;
+            height: 34px;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            color: #cbd5e1;
+        }
+
         .sidebar-user {
             position: sticky;
             bottom: 0;
@@ -150,6 +166,21 @@
         }
 
         .page-content { padding: 28px; }
+
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            background: rgba(15,23,42,0.46);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .sidebar-backdrop.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
         /* Cards */
         .stat-card {
@@ -216,6 +247,7 @@
             .sidebar { transform: translateX(-100%); }
             .sidebar.show { transform: translateX(0); }
             .main-content { margin-left: 0; }
+            .sidebar-close { display: flex; }
         }
 
         /* Avatar */
@@ -234,6 +266,9 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
+            <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Tutup menu">
+                <i class="fas fa-times"></i>
+            </button>
             <div class="d-flex align-items-center gap-2 mb-1">
                 <div style="width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;">
                     <i class="fas fa-id-card-alt text-white" style="font-size:14px;"></i>
@@ -294,12 +329,13 @@
             </form>
         </div>
     </div>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <!-- Main -->
     <div class="main-content">
         <div class="topbar">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-sm d-md-none" onclick="document.getElementById('sidebar').classList.toggle('show')" style="background:#f1f5f9;">
+                <button class="btn btn-sm d-md-none" id="sidebarToggle" style="background:#f1f5f9;" aria-label="Buka menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <span class="topbar-title">@yield('page-title', 'Dashboard')</span>
@@ -337,6 +373,40 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+        function openSidebar() {
+            sidebar.classList.add('show');
+            sidebarBackdrop.classList.add('show');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('show');
+            sidebarBackdrop.classList.remove('show');
+        }
+
+        sidebarToggle?.addEventListener('click', openSidebar);
+        sidebarClose?.addEventListener('click', closeSidebar);
+        sidebarBackdrop?.addEventListener('click', closeSidebar);
+
+        document.querySelectorAll('.sidebar-link').forEach((link) => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+    </script>
     @yield('scripts')
 </body>
 </html>

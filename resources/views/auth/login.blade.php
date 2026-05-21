@@ -17,108 +17,23 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
             display: flex;
-            background: #f1f5f9;
-        }
-
-        .left-panel {
-            flex: 1;
-            background: linear-gradient(145deg, #0f172a 0%, #1e3a5f 50%, #1a56db 100%);
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 60px 40px;
-            position: relative;
-            overflow: hidden;
+            background: #f1f5f9;
+            padding: 24px;
         }
 
-        .left-panel::before {
-            content: '';
-            position: absolute;
-            width: 500px; height: 500px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(96,165,250,0.15) 0%, transparent 70%);
-            top: -100px; right: -100px;
-        }
-
-        .left-panel::after {
-            content: '';
-            position: absolute;
-            width: 300px; height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%);
-            bottom: -50px; left: -50px;
-        }
-
-        .brand-logo {
-            width: 80px; height: 80px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 24px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 36px;
-            color: #fff;
-            margin-bottom: 28px;
-            border: 1px solid rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            position: relative; z-index: 1;
-        }
-
-        .brand-title {
-            color: #fff;
-            font-size: 32px;
-            font-weight: 900;
-            text-align: center;
-            line-height: 1.2;
-            margin-bottom: 12px;
-            position: relative; z-index: 1;
-        }
-
-        .brand-sub {
-            color: rgba(255,255,255,0.6);
-            font-size: 15px;
-            text-align: center;
-            position: relative; z-index: 1;
-        }
-
-        .features {
-            margin-top: 48px;
-            position: relative; z-index: 1;
-            width: 100%;
-            max-width: 320px;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .feature-item:last-child { border-bottom: none; }
-
-        .feature-icon {
-            width: 40px; height: 40px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: #60a5fa;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        .feature-text strong { color: #e2e8f0; font-size: 14px; display: block; }
-        .feature-text span { color: rgba(255,255,255,0.45); font-size: 12px; }
-
-        /* Right panel */
-        .right-panel {
+        .login-panel {
             width: 480px;
+            max-width: 100%;
             background: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 60px 48px;
+            padding: 48px;
+            border-radius: 18px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
         }
 
         .login-header { text-align: center; margin-bottom: 36px; width: 100%; }
@@ -211,55 +126,13 @@
         .info-box strong { color: #0c4a6e; }
 
         @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .left-panel { padding: 40px 24px; flex: none; min-height: 200px; }
-            .brand-title { font-size: 22px; }
-            .features { display: none; }
-            .right-panel { width: 100%; padding: 36px 24px; }
+            body { padding: 16px; }
+            .login-panel { width: 100%; padding: 36px 24px; }
         }
     </style>
 </head>
 <body>
-    <div class="left-panel">
-        <div class="brand-logo">
-            <i class="fas fa-id-card-alt"></i>
-        </div>
-        <div class="brand-title">Sistem Presensi<br>Apel Pagi</div>
-        <div class="brand-sub">Pemerintah Daerah</div>
-
-        <div class="features">
-            <div class="feature-item">
-                <div class="feature-icon"><i class="fas fa-camera"></i></div>
-                <div class="feature-text">
-                    <strong>Foto Selfie Otomatis</strong>
-                    <span>Bukti kehadiran dengan foto wajah</span>
-                </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon"><i class="fas fa-map-marker-alt"></i></div>
-                <div class="feature-text">
-                    <strong>GPS Lokasi Real-time</strong>
-                    <span>Koordinat lokasi tercatat otomatis</span>
-                </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon"><i class="fas fa-file-archive"></i></div>
-                <div class="feature-text">
-                    <strong>Rekap & Laporan</strong>
-                    <span>Download rekap dan foto presensi</span>
-                </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon"><i class="fas fa-clock"></i></div>
-                <div class="feature-text">
-                    <strong>Status Presensi</strong>
-                    <span>Hadir atau belum presensi</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="right-panel">
+    <div class="login-panel">
         <div class="login-header">
             <h2>Selamat Datang</h2>
             <p>Masuk menggunakan NIP dan password Anda</p>

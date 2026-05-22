@@ -157,6 +157,10 @@ class AbsensiController extends Controller
 
     private function tambahkanWatermarkFoto(string $fotoDecoded, Carbon $waktuAbsen, ?string $alamat, float $latitude, float $longitude): string
     {
+        if (!$this->gdWatermarkTersedia()) {
+            return $fotoDecoded;
+        }
+
         $image = @imagecreatefromstring($fotoDecoded);
         if (!$image) {
             return $fotoDecoded;
@@ -217,6 +221,32 @@ class AbsensiController extends Controller
         imagedestroy($image);
 
         return $watermarked ?: $fotoDecoded;
+    }
+
+    private function gdWatermarkTersedia(): bool
+    {
+        $requiredFunctions = [
+            'imagecreatefromstring',
+            'imagepalettetotruecolor',
+            'imagesx',
+            'imagesy',
+            'imagefontheight',
+            'imagefontwidth',
+            'imagecolorallocatealpha',
+            'imagefilledrectangle',
+            'imagecolorallocate',
+            'imagestring',
+            'imagejpeg',
+            'imagedestroy',
+        ];
+
+        foreach ($requiredFunctions as $function) {
+            if (!function_exists($function)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function wrapWatermarkText(string $text, ?string $fontPath, int $fontSize, int $maxWidth, int $maxLines = 3): array

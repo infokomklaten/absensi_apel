@@ -26,6 +26,7 @@
         height: 100%;
         object-fit: cover;
         display: block;
+        transform: scaleX(-1);
     }
 
     #canvasElement { display: none; }

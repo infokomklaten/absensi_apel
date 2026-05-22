@@ -69,7 +69,7 @@
             font-size: 15px;
         }
 
-        input[type=text], input[type=password] {
+        .form-input {
             width: 100%;
             padding: 13px 14px 13px 42px;
             border: 1.5px solid #e2e8f0;
@@ -79,6 +79,37 @@
             transition: border-color 0.2s, box-shadow 0.2s;
             outline: none;
             color: #0f172a;
+        }
+
+        .password-input {
+            padding-right: 46px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-50%);
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .password-toggle:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .password-toggle:focus-visible {
+            outline: 3px solid rgba(26,86,219,0.18);
         }
 
         input:focus {
@@ -152,7 +183,7 @@
                 <label>NIP</label>
                 <div class="input-wrapper">
                     <i class="fas fa-id-badge input-icon"></i>
-                    <input type="text" name="nip" placeholder="Masukkan NIP Anda"
+                    <input class="form-input" type="text" name="nip" placeholder="Masukkan NIP Anda"
                            value="{{ old('nip') }}" autocomplete="username" required>
                 </div>
             </div>
@@ -161,8 +192,11 @@
                 <label>Password</label>
                 <div class="input-wrapper">
                     <i class="fas fa-lock input-icon"></i>
-                    <input type="password" name="password" placeholder="Masukkan password Anda"
+                    <input class="form-input password-input" type="password" name="password" id="password" placeholder="Masukkan password Anda"
                            autocomplete="current-password" required>
+                    <button class="password-toggle" type="button" id="togglePassword" aria-label="Lihat password" aria-pressed="false">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
 
@@ -178,5 +212,19 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const toggleIcon = togglePassword.querySelector('i');
+
+        togglePassword.addEventListener('click', () => {
+            const isHidden = passwordInput.type === 'password';
+            passwordInput.type = isHidden ? 'text' : 'password';
+            togglePassword.setAttribute('aria-label', isHidden ? 'Sembunyikan password' : 'Lihat password');
+            togglePassword.setAttribute('aria-pressed', String(isHidden));
+            toggleIcon.classList.toggle('fa-eye', !isHidden);
+            toggleIcon.classList.toggle('fa-eye-slash', isHidden);
+        });
+    </script>
 </body>
 </html>
